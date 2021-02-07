@@ -21,7 +21,7 @@ int* compute_prefix(const char* pat){
 
 	int k = 0;
 	for(int q = 1; q < m; q ++){
-		while(k > 0 && pat[k] != pat[q]) k = pi[k];
+		while(k > 0 && pat[k] != pat[q]) k = pi[k-1];
 		if(pat[k] == pat[q]) k ++;
 
 		pi[q] = k;	
