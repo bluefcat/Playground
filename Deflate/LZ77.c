@@ -1,5 +1,4 @@
 #include "LZ77.h"
-#include <stdio.h>
 
 LLD* compress_LZ77(const char* str, int wsize, int lsize){
 	int n = count_string(str);
