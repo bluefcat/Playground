@@ -45,7 +45,6 @@ int find_pattern(const char* str, const char* pat){
 		if(q == m){
 			result = i-m+1;
 			q = pi[q];
-			break;
 		}
 	}
 	free(pi);
