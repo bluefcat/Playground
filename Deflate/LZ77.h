@@ -9,4 +9,4 @@ typedef struct _LLD{
 } LLD;
 #pragma pack(pop)
 
-LLD* compress_LZ77(const char* str, int wsize, int lsize);
+LLD* encoding_LZ77(const char* str, int wsize, int lsize);
