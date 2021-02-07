@@ -39,12 +39,13 @@ int find_pattern(const char* str, const char* pat){
 
 	int q = 0;
 	for(int i = 0; i < n; i ++){
-		while(q > 0 && pat[q] != str[i]) q = pi[q];
+		while(q > 0 && pat[q] != str[i]) q = pi[q-1];
 		if(pat[q] == str[i]) q ++;
 
 		if(q == m){
 			result = i-m+1;
 			q = pi[q];
+			break;
 		}
 	}
 	free(pi);
