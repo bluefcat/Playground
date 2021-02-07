@@ -8,6 +8,11 @@ unsigned int count_string(const char* str){
 	return result ;
 }
 
+void copy_string(char* dest, const char* src, int size){
+	for(int i = 0; i < size && *src; i ++) dest[i] = src[i];
+	return ;
+}
+
 int* compute_prefix(const char* pat){
 	unsigned int m = count_string(pat);
 
