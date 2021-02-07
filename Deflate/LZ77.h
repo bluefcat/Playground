@@ -10,3 +10,4 @@ typedef struct _LLD{
 #pragma pack(pop)
 
 LLD* encoding_LZ77(const char* str, int wsize, int lsize);
+char* decoding_LZ77(const LLD* object, int wsize, int lsize);

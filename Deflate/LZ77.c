@@ -66,3 +66,32 @@ LLD* encoding_LZ77(const char* str, int wsize, int lsize){
 
 	return result;
 }
+
+char* decoding_LZ77(const LLD* object, int wsize, int lsize){
+	//initialize result
+	char* result = (char*)malloc(sizeof(char)*100+1);
+	for(int i = 0; i <= 100; i ++) result[i] = 0;
+
+	LLD* cursor = object;
+	
+	int p = 0;
+	while(cursor->literal){
+		//structure content
+		int distance = cursor->distance;
+		int length = cursor->length+1;
+		char literal = (char)cursor->literal;
+
+		for(int i = 0; i < length; i ++){
+			if(i == length-1) result[p+i] = literal;
+			else {
+				result[p+i] = result[p-distance+i];
+			}
+			
+		}
+		p += length;
+
+		cursor ++;
+	}
+
+	return result;
+}
