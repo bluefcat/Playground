@@ -7,8 +7,10 @@
 
 #pragma pack(push, 1)
 typedef struct _Header_LZ77{
-	unsigned short magic_code;
-	unsigned int file_size;
+	unsigned short mcode;
+	unsigned short wsize;
+	unsigned short lsize;
+	unsigned int fsize;
 } Header_LZ77;
 #pragma pack(pop)
 
@@ -20,7 +22,7 @@ typedef struct _LLD{
 } LLD;
 #pragma pack(pop)
 
-Header_LZ77* create_header(unsigned int file_size);
+Header_LZ77* create_header(unsigned short wsize, unsigned short lsize, unsigned int fsize);
 int count_LLD(const LLD* object);
 
 int encoding_LZ77f(const char* src_name, int wsize, int lsize);
