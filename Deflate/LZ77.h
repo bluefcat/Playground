@@ -14,8 +14,8 @@ typedef struct _Header_LZ77{
 
 #pragma pack(push, 1)
 typedef struct _LLD{
-	unsigned int distance;
-	unsigned int length;
+	BYTE distance;
+	BYTE length;
 	BYTE literal;
 } LLD;
 #pragma pack(pop)
@@ -24,7 +24,7 @@ Header_LZ77* create_header(unsigned int file_size);
 int count_LLD(const LLD* object);
 
 int encoding_LZ77f(const char* src_name, int wsize, int lsize);
-int decoding_LZ77f(const char* src_name);
+int decoding_LZ77f(const char* src_name, const char* dest_name);
 
 LLD* encoding_LZ77(const char* str, int wsize, int lsize);
 char* decoding_LZ77(LLD* object, int wsize, int lsize);
