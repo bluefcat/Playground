@@ -32,6 +32,7 @@ int encoding_LZ77f(const char* src_name, int wsize, int lsize){
 
 	//write header about LZ77 to dest file
 	fseek(src, 0, SEEK_END);
+	int file_size = ftell(src);
 	Header_LZ77* header = create_header(ftell(src));
 	fwrite(header, sizeof(Header_LZ77), 1, dest);
 	free(header);
@@ -43,18 +44,19 @@ int encoding_LZ77f(const char* src_name, int wsize, int lsize){
 	int lp = 0;
 
 
-	BYTE* wbuf = (BYTE*)malloc(sizeof(BYTE)*wsize+1);
-	BYTE* lbuf = (BYTE*)malloc(sizeof(BYTE)*lsize+1);
+	BYTE* wbuf = (BYTE*)malloc(sizeof(BYTE)*(wsize+1));
+	BYTE* lbuf = (BYTE*)malloc(sizeof(BYTE)*(lsize+1));
 
-	BYTE* fbuf = (BYTE*)malloc(sizeof(BYTE)*psize+1);
+	BYTE* fbuf = (BYTE*)malloc(sizeof(BYTE)*(psize+1));
 	LLD* obuf = (LLD*)malloc(sizeof(LLD)*psize);
+
 
 	while(!feof(src)){
 		//initialize fbuf and read file
 		for(int i = 0; i < psize; i ++) fbuf[i] = 0;
 		fread(fbuf+lp, sizeof(BYTE), psize-lp, src);
 		int count = 0;
-
+		printf("[%d/%d]\n", file_size, ftell(src));
 		//here encoding code
 		while(lp < psize){
 			//if can't read as much as lsize in fbuf, read again.
@@ -80,7 +82,7 @@ int encoding_LZ77f(const char* src_name, int wsize, int lsize){
 				//initailize lbuf 
 				for(int j = 0; j <= lsize; j ++) lbuf[j] = 0;
 				copy_string(lbuf, fbuf+lp, i);
-				
+
 				int r = find_pattern(wbuf, lbuf);
 				if(r == -1) break;
 
@@ -99,6 +101,11 @@ int encoding_LZ77f(const char* src_name, int wsize, int lsize){
 					break;
 				}
 			}
+			if(!fbuf[lp+length]) break;
+			
+			//printf("(%d %d \"%2.x\")[%d/%d], wbuf : [%d(+%d)/%d], lbuf : [%d/%d]\n", 
+			//distance, length, fbuf[lp+length], psize, count, wsize, lsize, wsearch_size, lsize, length);
+			
 			obuf[count].distance = distance;
 			obuf[count].length = length;
 			obuf[count].literal = fbuf[lp+length];
@@ -113,7 +120,6 @@ int encoding_LZ77f(const char* src_name, int wsize, int lsize){
 		//write encoding content
 		int obuf_length = count_LLD(obuf);
 		fwrite(obuf, sizeof(LLD), obuf_length, dest);
-
 		for(int i = 0; i < obuf_length; i ++){
 			obuf[i].distance = 0;
 			obuf[i].length = 0;
@@ -132,76 +138,49 @@ int encoding_LZ77f(const char* src_name, int wsize, int lsize){
 	return 0;
 }
 
-int decoding_LZ77f(const char* src_name){
+int decoding_LZ77f(const char* src_name, const char* dest_name){
 	
 	return 0;
 }
 
 LLD* encoding_LZ77(const char* str, int wsize, int lsize){
-	int n = count_string(str);
-	LLD* result = (LLD*)malloc(sizeof(LLD)*n);
+	int total_size = count_string(str);
 
-	int wp = 0;
+	BYTE* wbuf = (BYTE*)malloc(sizeof(BYTE)*(wsize+lsize+1));
+	BYTE* lbuf = (BYTE*)malloc(sizeof(BYTE)*(lsize+1));
+	int wp = 0, lp = 0;
+	
+	while(lp <= total_size){
+		copy_string(wbuf, str+wp, lp-wp+lsize);
 
-	char* wbuf = (char*)malloc(sizeof(char)*(wsize+lsize/2)+1);
-	char* lbuf = (char*)malloc(sizeof(char)*lsize+1);
-
-	int lp = 0;
-	int count = 0;	
-	while(lp < n){
-		while(lp > wsize+wp) wp ++;
-		
-		//initialize wbuf and lbuf
-		for(int i = 0; i < (wsize+lsize/2)+1; i ++) wbuf[i] = 0;
-		for(int i = 0; i < lsize+1; i ++) lbuf[i] = 0;
-
-		int wseach_size = lp-wp;
-		copy_string(wbuf, str+wp, wseach_size);
-		
-		int distance = 0;
-		int length = 0;
+		int distance = 0, length = 0, literal = 0;
 
 		for(int i = 1; i <= lsize; i ++){
-			//initialize lbuf
-			for(int j = 0; j < lsize+1; j ++) lbuf[j] = 0;
 			copy_string(lbuf, str+lp, i);
+			int p = find_pattern(wbuf, lbuf);
+			
+			if(p == -1 || p >= lp-wp) break;
 
-			int r = find_pattern(wbuf, lbuf);
-
-			if(r == -1) break;
-
-			if(i+r >= count_string(wbuf)){
-				for(int j = 0; j < (wsize+lsize/2)+1; j ++)wbuf[j] = 0;
-				wseach_size ++;
-				copy_string(wbuf, str+wp, wseach_size);
-			}
-
-			distance = (lp-wp)-r;
-			length = i;	
-
-			//about endword
-			if(lp+i == n){
+			distance = lp-wp-p;
+			length = i;
+			if(lp+i == total_size){
 				length --;
 				break;
 			}
 		}
-		wseach_size = lp-wp;
+		if(lp+length >= total_size) break;
 
-		result[count].distance = distance;
-		result[count].length = length;
-		result[count].literal = str[lp+length];
+		literal = str[lp+length];
+		printf("(%d %d \"%c\")\n", distance, length, literal);
 
+		
 		lp += length+1;
-		count ++;
+		wp += lp-wp > wsize ? lp-wp-wsize : 0;
 	}
-
-	result = (LLD*)realloc(result, sizeof(LLD)*(count+1));
-	result[count].literal = 0;
 
 	free(lbuf);
 	free(wbuf);
-
-	return result;
+	return NULL;
 }
 
 char* decoding_LZ77(LLD* object, int wsize, int lsize){
