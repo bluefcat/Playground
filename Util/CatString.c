@@ -30,7 +30,9 @@ unsigned int count_string(const char* str){
 }
 
 void copy_string(char* dest, const char* src, int size){
-	for(int i = 0; i < size && *src; i ++) dest[i] = src[i];
+	int i = 0;
+	for(i = 0; i < size && *src; i ++) dest[i] = src[i];
+	dest[i] = 0;
 	return ;
 }
 
@@ -66,6 +68,7 @@ int find_pattern(const char* str, const char* pat){
 		if(q == m){
 			result = i-m+1;
 			q = pi[q];
+			break;
 		}
 	}
 	free(pi);
