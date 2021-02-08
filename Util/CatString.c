@@ -1,5 +1,26 @@
 #include "CatString.h"
 
+char* change_ext(const char* src, const char* ext){
+	// s_file is length of path
+	// s_ext is position of file ext
+	int s_file = find_pattern(src, "/") + 1;
+	int s_ext = find_pattern(src+s_file, ".");
+	int ext_length = count_string(ext);
+
+	int result_length = s_file+count_string(src+s_file)-s_ext+ext_length;
+	char* result = (char*)malloc(sizeof(char)*result_length+1);
+	for(int i = 0; i <= result_length; i ++) result[i] = 0;
+
+	// copy path to result
+	// copy filename to result within "."
+	// copy ext to result
+	copy_string(result, src, s_file);
+	copy_string(result+s_file, src+s_file, s_ext+1);
+	copy_string(result+s_file+s_ext+1, ext, ext_length);
+
+	return result;
+}
+
 unsigned int count_string(const char* str){
 	unsigned int result = 0;
 	while(*(str++)){
