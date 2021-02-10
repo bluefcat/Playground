@@ -29,6 +29,15 @@ unsigned int count_string(const char* str){
 	return result ;
 }
 
+void shift_string(char* str, int pos){
+	//position range [0, sizeof(str))
+	int length = count_string(str);
+	for(int i = 0; i < pos; i ++) str[i] = str[i+pos];
+	str[length - pos] = 0;
+	
+	return ;
+}
+
 void copy_string(char* dest, const char* src, int size){
 	int i = 0;
 	for(i = 0; i < size && *src; i ++) dest[i] = src[i];
