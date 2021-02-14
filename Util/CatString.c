@@ -30,6 +30,8 @@ unsigned int count_string(const char* str){
 }
 
 void shift_string(char* str, int pos){
+	if(pos == 0) return;
+
 	//position range [0, sizeof(str))
 	int length = count_string(str);
 	for(int i = 0; i < pos; i ++) str[i] = str[i+pos];
@@ -39,6 +41,8 @@ void shift_string(char* str, int pos){
 }
 
 void copy_string(char* dest, const char* src, int size){
+	if(size == 0) return ;
+
 	int i = 0;
 	for(i = 0; i < size && *src; i ++) dest[i] = src[i];
 	dest[i] = 0;
@@ -67,6 +71,8 @@ int find_pattern(const char* str, const char* pat){
 
 	int n = count_string(str);
 	int m = count_string(pat);
+	if(n == 0 || m == 0) return n;
+
 	int* pi = compute_prefix(pat);
 
 	int q = 0;
